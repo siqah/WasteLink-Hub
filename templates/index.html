@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Smart Waste Management Solutions</h1>
+                <p class="lead mb-4">Connecting households, businesses, and waste collectors for a cleaner, more sustainable community.</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4">Get Started</a>
+                    <a href="#how-it-works" class="btn btn-outline-light btn-lg px-4">Learn More</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{{ url_for('static', filename='images/hero-image.png') }}" alt="Waste management illustration" class="img-fluid rounded-3 shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Why Choose WasteLink Hub?</h2>
+            <p class="lead text-muted">Our platform makes waste management simple and efficient</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-house-door text-primary fs-1"></i>
+                        </div>
+                        <h4>For Households</h4>
+                        <p>Schedule waste pickups with certified collectors in your area with just a few clicks.</p>
+                        <a href="{{ url_for('register') }}?role=household" class="btn btn-outline-primary">Join as Household</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-truck text-primary fs-1"></i>
+                        </div>
+                        <h4>For Collectors</h4>
+                        <p>Grow your business by connecting with customers needing waste collection services.</p>
+                        <a href="{{ url_for('register') }}?role=collector" class="btn btn-outline-primary">Join as Collector</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-recycle text-primary fs-1"></i>
+                        </div>
+                        <h4>For Businesses</h4>
+                        <p>Manage your commercial waste efficiently with our professional network.</p>
+                        <a href="{{ url_for('register') }}?role=business" class="btn btn-outline-primary">Join as Business</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How It Works</h2>
+            <p class="lead text-muted">Simple steps to better waste management</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center px-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4 fw-bold">1</span>
+                    </div>
+                    <h4>Create Account</h4>
+                    <p>Register as a household, business, or waste collector</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center px-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4 fw-bold">2</span>
+                    </div>
+                    <h4>Set Up Profile</h4>
+                    <p>Provide your details and service preferences</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center px-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4 fw-bold">3</span>
+                    </div>
+                    <h4>Request/Offer Services</h4>
+                    <p>Schedule pickups or find available jobs</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center px-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4 fw-bold">4</span>
+                    </div>
+                    <h4>Complete Transaction</h4>
+                    <p>Get notified when service is completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">What Our Users Say</h2>
+            <p class="lead text-muted">Trusted by communities across the region</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-4">"WasteLink has made it so easy to schedule pickups. I no longer have to worry about missing collection days!"</p>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='images/user1.jpg') }}" class="rounded-circle me-3" width="50" height="50" alt="User">
+                            <div>
+                                <h6 class="mb-0">Sarah Johnson</h6>
+                                <small class="text-muted">Homeowner</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-4">"As a small waste collection business, WasteLink has helped me double my customer base in just 3 months."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='images/user2.jpg') }}" class="rounded-circle me-3" width="50" height="50" alt="User">
+                            <div>
+                                <h6 class="mb-0">Michael Rodriguez</h6>
+                                <small class="text-muted">Waste Collector</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-4">"Our restaurant's waste management has never been more efficient. The platform saves us time and money."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='images/user3.jpg') }}" class="rounded-circle me-3" width="50" height="50" alt="User">
+                            <div>
+                                <h6 class="mb-0">David Chen</h6>
+                                <small class="text-muted">Restaurant Owner</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-4">Ready to Transform Your Waste Management?</h2>
+        <p class="lead mb-4">Join thousands of satisfied users making a difference in their communities</p>
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-5">Sign Up Free</a>
+    </div>
+</section>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #2c5f8a 0%, #4a9c8d 100%);
+    }
+    .card {
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    section {
+        padding: 5rem 0;
+    }
+</style>
+{% endblock %}

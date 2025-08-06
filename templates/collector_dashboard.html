@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Pending Pickup Requests</h2>
+<p>Review and accept available pickup requests in your area.</p>
+<div id="pending-pickups"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function loadPendingPickups() {
+        fetch('/pickups?status=pending')
+          .then(res => res.json())
+          .then(data => {
+            const list = document.getElementById('pending-pickups');
+            if (data.length > 0) {
+                list.innerHTML = data.map(p => `
+                    <div class="card">
+                        <p><strong>Request ID:</strong> ${p.id}</p>
+                        <p><strong>Date:</strong> ${p.scheduled_date}</p>
+                        <p><strong>Type:</strong> ${p.waste_type}</p>
+                        <button class="btn btn-secondary" onclick="acceptPickup(${p.id})">Accept Request</button>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p>No pending pickup requests available.</p>';
+            }
+          });
+    }
+
+    window.acceptPickup = function(id) {
+        fetch(`/pickups/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'accepted' })
+        })
+        .then(res => res.json())
+        .then(result => {
+            alert(result.message || result.error);
+            loadPendingPickups();
+        });
+    }
+
+    loadPendingPickups();
+});
+</script>
+{% endblock %}

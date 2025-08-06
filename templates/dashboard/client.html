@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Client Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Welcome, {{ user.username }}!</h2>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Request a Pickup</h5>
+                    <p class="card-text">Schedule a new waste pickup for your home or business.</p>
+                    <a href="{{ url_for('request_pickup') }}" class="btn btn-primary">Request a Pickup</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">My Pickups</h5>
+                    <p class="card-text">View the status of your pickup requests.</p>
+                    <a href="#" class="btn btn-info disabled">View My Pickups</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

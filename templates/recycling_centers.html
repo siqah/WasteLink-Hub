@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Recycling Centers</h2>
+<p>Find recycling centers near you and see what materials they accept.</p>
+<div id="centers-list"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/recycling_centers')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('centers-list');
+        if (data.length > 0) {
+            list.innerHTML = data.map(c => `
+                <div class="card">
+                    <h3>${c.name}</h3>
+                    <p><strong>Location:</strong> ${c.location}</p>
+                    <p><strong>Accepts:</strong> ${c.materials_accepted}</p>
+                    <p><strong>Contact:</strong> ${c.contact_info}</p>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<p>No recycling centers found.</p>';
+        }
+      });
+});
+</script>
+{% endblock %}

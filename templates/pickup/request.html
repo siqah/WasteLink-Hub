@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Request Pickup{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Request a Waste Pickup</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('request_pickup') }}" method="POST" class="needs-validation" novalidate>
+        <div class="form-group">
+            <label for="scheduled_date">Scheduled Date and Time</label>
+            <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
+            <div class="invalid-feedback">
+                Please provide a valid date and time.
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="waste_type">Type of Waste</label>
+            <select class="form-control" id="waste_type" name="waste_type" required>
+                <option value="">Choose...</option>
+                <option value="organic">Organic</option>
+                <option value="plastic">Plastic</option>
+                <option value="paper">Paper</option>
+                <option value="glass">Glass</option>
+                <option value="metal">Metal</option>
+                <option value="e-waste">E-Waste</option>
+                <option value="other">Other</option>
+            </select>
+            <div class="invalid-feedback">
+                Please select a waste type.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="waste_description">Waste Description (Optional)</label>
+            <textarea class="form-control" id="waste_description" name="waste_description" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="special_instructions">Special Instructions (Optional)</label>
+            <textarea class="form-control" id="special_instructions" name="special_instructions" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit Request</button>
+    </form>
+</div>
+{% endblock %}

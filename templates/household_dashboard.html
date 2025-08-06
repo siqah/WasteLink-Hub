@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h2>Request a Waste Pickup</h2>
+    <form id="pickup-form">
+        <div>
+            <label for="scheduled_date">Pickup Date:</label>
+            <input type="date" id="scheduled_date" name="scheduled_date" required>
+        </div>
+        <div>
+            <label for="waste_type">Waste Type:</label>
+            <select id="waste_type" name="waste_type">
+                <option value="general">General</option>
+                <option value="recyclables">Recyclables</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Request Pickup</button>
+    </form>
+</div>
+
+<hr>
+
+<h2>Your Pickup Requests</h2>
+<div id="pickup-list"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pickupForm = document.getElementById('pickup-form');
+    pickupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(pickupForm);
+        const data = {
+            scheduled_date: formData.get('scheduled_date'),
+            waste_type: formData.get('waste_type')
+        };
+
+        fetch('/pickups', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            alert(result.message);
+            loadPickups();
+        });
+    });
+
+    function loadPickups() {
+        fetch('/pickups?status=pending') // Assuming this fetches pickups for the logged-in user
+          .then(res => res.json())
+          .then(data => {
+            const list = document.getElementById('pickup-list');
+            if (data.length > 0) {
+                list.innerHTML = data.map(p => `
+                    <div class="card">
+                        <p><strong>Request ID:</strong> ${p.id}</p>
+                        <p><strong>Date:</strong> ${p.scheduled_date}</p>
+                        <p><strong>Type:</strong> ${p.waste_type}</p>
+                        <p><strong>Status:</strong> Pending</p>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p>You have no pending pickup requests.</p>';
+            }
+          });
+    }
+
+    loadPickups();
+});
+</script>
+{% endblock %}

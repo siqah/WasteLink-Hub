@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Collector Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Collector Dashboard</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Available Pickups</h5>
+                    <p class="card-text">View and accept new pickup requests.</p>
+                    <a href="{{ url_for('available_pickups') }}" class="btn btn-primary">View Available Pickups</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">My Accepted Pickups</h5>
+                    <p class="card-text">View the pickups you have accepted.</p>
+                    <a href="{{ url_for('my_pickups') }}" class="btn btn-primary">View My Pickups</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Recycling Center Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Recycling Center Dashboard</h2>
+    
+    <h3 class="mt-5">Completed Pickups</h3>
+    {% if pickups %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Request ID</th>
+                    <th scope="col">Waste Type</th>
+                    <th scope="col">Completion Date</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pickup in pickups %}
+                <tr>
+                    <td>{{ pickup.id }}</td>
+                    <td>{{ pickup.waste_type }}</td>
+                    <td>{{ pickup.completion_date.strftime('%Y-%m-%d %H:%M') if pickup.completion_date else 'N/A' }}</td>
+                    <td><span class="badge badge-primary">{{ pickup.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">No completed pickups to display.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Welcome to WasteLink Hub</h1>
+    <p>Your one-stop solution for efficient waste management and recycling.</p>
+    
+    <div class="card">
+        <h3>For Households & Businesses</h3>
+        <p>Schedule waste pickups with ease and contribute to a cleaner environment.</p>
+        <a href="{{ url_for('household_dashboard') }}" class="btn">Request a Pickup</a>
+    </div>
+
+    <div class="card">
+        <h3>For Waste Collectors</h3>
+        <p>Find and accept pickup requests in your area to grow your business.</p>
+        <a href="{{ url_for('collector_dashboard') }}" class="btn">View Available Pickups</a>
+    </div>
+
+    <div class="card">
+        <h3>Recycling Centers</h3>
+        <p>Discover local recycling centers and the materials they accept.</p>
+        <a href="{{ url_for('recycling_centers_page') }}" class="btn">Find a Center</a>
+    </div>
+{% endblock %}
