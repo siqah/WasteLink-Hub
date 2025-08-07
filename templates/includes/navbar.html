@@ -1,31 +1,52 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="{{ url_for('home') }}">WasteLink Hub</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-            {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    {% if current_user.role == 'household' %}
-                        <a class="nav-link" href="{{ url_for('client_dashboard') }}">Dashboard</a>
-                    {% elif current_user.role == 'collector' %}
-                        <a class="nav-link" href="{{ url_for('collector_dashboard') }}">Dashboard</a>
-                    {% elif current_user.role == 'recycling_center' %}
-                        <a class="nav-link" href="{{ url_for('recycling_center_dashboard') }}">Dashboard</a>
-                    {% endif %}
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
+    <div class="container-fluid">
+        <!-- Brand/logo on the left -->
+        <a class="navbar-brand me-auto fw-bold" href="{{ url_for('home') }}">
+            <i class="bi bi-recycle me-2"></i>WasteLink Hub
+        </a>
+        
+        <!-- Mobile toggle button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navigation links on the right -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        {% if current_user.role == 'household' %}
+                            <a class="nav-link" href="{{ url_for('client_dashboard') }}">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
+                        {% elif current_user.role == 'collector' %}
+                            <a class="nav-link" href="{{ url_for('collector_dashboard') }}">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
+                        {% elif current_user.role == 'recycling_center' %}
+                            <a class="nav-link" href="{{ url_for('recycling_center_dashboard') }}">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">
+                            <i class="bi bi-person-plus me-1"></i>Register
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </nav>
