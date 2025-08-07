@@ -79,6 +79,12 @@ def validate_password(password):
 def home():
     return render_template('index.html')
 
+@app.route('/init-db-4918')
+def init_db():
+    with app.app_context():
+        db.create_all()
+    return "Database has been initialized!"
+
 @app.route('/about')
 def about():
     return render_template('about.html')
