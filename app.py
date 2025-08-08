@@ -74,6 +74,14 @@ class PickupRequest(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     completion_date = db.Column(db.DateTime)
 
+# Ensure tables exist when the first request hits the app (helps if DB was not ready at startup)
+@app.before_first_request
+def ensure_tables_created():
+    try:
+        db.create_all()
+    except Exception as e:
+        app.logger.error(f"DB init on first request failed: {e}")
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
