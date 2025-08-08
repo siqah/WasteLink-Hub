@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import re
 import os
+from sqlalchemy import inspect
 
 app = Flask(__name__)
 
@@ -22,9 +23,21 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Ensure tables exist on startup (useful on Render free tier without shell)
+with app.app_context():
+    try:
+        inspector = inspect(db.engine)
+        # Create tables if they don't exist
+        if not inspector.has_table('users') or not inspector.has_table('pickup_requests'):
+            db.create_all()
+    except Exception:
+        # Avoid breaking app startup if DB is temporarily unavailable
+        pass
+
 
 # Models
 class User(db.Model, UserMixin):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -49,9 +62,10 @@ class User(db.Model, UserMixin):
     operating_hours = db.Column(db.String(100))
 
 class PickupRequest(db.Model):
+    __tablename__ = 'pickup_requests'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    collector_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    collector_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     scheduled_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, accepted, completed, cancelled
     waste_type = db.Column(db.String(50), nullable=False)
@@ -78,12 +92,6 @@ def validate_password(password):
 @app.route('/')
 def home():
     return render_template('index.html')
-
-@app.route('/init-db-4918')
-def init_db():
-    with app.app_context():
-        db.create_all()
-    return "Database has been initialized!"
 
 @app.route('/about')
 def about():
@@ -313,8 +321,3 @@ def accept_request(request_id):
     
     flash('Pickup request accepted!', 'success')
     return redirect(url_for('collector_dashboard'))
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
