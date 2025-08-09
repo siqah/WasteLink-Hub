@@ -13,7 +13,6 @@ from flask_wtf.csrf import generate_csrf
 
 app = Flask(__name__)
 
-# Configure database URI
 # Use DATABASE_URL from environment variables if available, otherwise fall back to SQLite
 database_url = os.environ.get('DATABASE_URL')
 if database_url and database_url.startswith("postgres://"):
@@ -259,7 +258,7 @@ def collector_dashboard():
         return redirect(url_for('home'))
     
     pending_requests = PickupRequest.query.filter_by(status='pending').all()
-    return render_template('dashboard/collector.html', user=current_user, requests=pending_requests)
+    return render_template('dashboard/collector_dashboard.html', user=current_user, requests=pending_requests)
 
 @app.route('/recycling-center-dashboard')
 @login_required
@@ -385,4 +384,5 @@ def healthz():
     return 'ok', 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    # Local only; Render uses gunicorn
+    app.run(host='0.0.0.0', debug=False)
