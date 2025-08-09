@@ -370,6 +370,22 @@ def accept_request(request_id):
     flash('Pickup request accepted!', 'success')
     return redirect(url_for('collector_dashboard'))
 
+@app.route('/my-requests')
+@login_required
+def my_requests():
+    # Household and business users can view their own pickup requests
+    if current_user.role not in ['business', 'household']:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('home'))
+
+    user_requests = (
+        PickupRequest.query
+        .filter_by(user_id=current_user.id)
+        .order_by(PickupRequest.created_at.desc())
+        .all()
+    )
+    return render_template('pickup/my_requests.html', requests=user_requests)
+
 # Error handlers and health check
 @app.errorhandler(404)
 def not_found(e):
