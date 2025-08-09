@@ -34,6 +34,7 @@
                     <td><span class="badge badge-warning">{{ request.status }}</span></td>
                     <td>
                         <form action="{{ url_for('accept_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button type="submit" class="btn btn-success btn-sm">Accept</button>
                         </form>
                     </td>

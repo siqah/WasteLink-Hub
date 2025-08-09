@@ -14,20 +14,14 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav">
                 {% if current_user.is_authenticated %}
+                    {% set dash_endpoint =
+                        'collector_dashboard' if current_user.role == 'collector'
+                        else ('recycling_center_dashboard' if current_user.role == 'recycling_center'
+                        else 'client_dashboard') %}
                     <li class="nav-item">
-                        {% if current_user.role == 'household' %}
-                            <a class="nav-link" href="{{ url_for('client_dashboard') }}">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
-                        {% elif current_user.role == 'collector' %}
-                            <a class="nav-link" href="{{ url_for('collector_dashboard') }}">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
-                        {% elif current_user.role == 'recycling_center' %}
-                            <a class="nav-link" href="{{ url_for('recycling_center_dashboard') }}">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
-                        {% endif %}
+                        <a class="nav-link" href="{{ url_for(dash_endpoint) }}">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">

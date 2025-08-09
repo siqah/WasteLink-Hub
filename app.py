@@ -7,6 +7,9 @@ import re
 import os
 from sqlalchemy import inspect
 import threading
+from flask_wtf import CSRFProtect
+from flask_wtf import csrf as csrf_module
+from flask_wtf.csrf import generate_csrf
 
 app = Flask(__name__)
 
@@ -19,6 +22,20 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///wastelink.db'
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here-for-dev')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Improve connection resilience on Render
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
+# Enable CSRF
+app.config['WTF_CSRF_ENABLED'] = True
+
+csrf = CSRFProtect(app)
+
+@app.context_processor
+def inject_csrf_token():
+    return dict(csrf_token=generate_csrf)
+
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -101,7 +118,14 @@ class PickupRequest(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    # SQLAlchemy 2.0 style lookup to avoid legacy warnings
+    return db.session.get(User, int(user_id))
+
+# Optional: friendlier redirect when unauthorized
+@login_manager.unauthorized_handler
+def _unauthorized():
+    flash('Please log in to continue.', 'warning')
+    return redirect(url_for('login', next=request.path))
 
 # Helper functions
 def validate_email(email):
@@ -346,3 +370,19 @@ def accept_request(request_id):
     
     flash('Pickup request accepted!', 'success')
     return redirect(url_for('collector_dashboard'))
+
+# Error handlers and health check
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('errors/500.html'), 500
+
+@app.route('/healthz')
+def healthz():
+    return 'ok', 200
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')

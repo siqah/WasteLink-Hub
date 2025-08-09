@@ -15,6 +15,7 @@
     {% endwith %}
 
     <form action="{{ url_for('request_pickup') }}" method="POST" class="needs-validation" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="form-group">
             <label for="scheduled_date">Scheduled Date and Time</label>
             <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
