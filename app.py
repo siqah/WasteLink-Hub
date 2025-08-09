@@ -6,6 +6,7 @@ from datetime import datetime
 import re
 import os
 from sqlalchemy import inspect
+import threading
 
 app = Flask(__name__)
 
@@ -33,6 +34,30 @@ with app.app_context():
     except Exception:
         # Avoid breaking app startup if DB is temporarily unavailable
         pass
+
+# One-time ensure tables fallback for Flask>=3 (no before_first_request)
+_tables_initialized = False
+_tables_lock = threading.Lock()
+
+def ensure_tables_once():
+    global _tables_initialized
+    if _tables_initialized:
+        return
+    with _tables_lock:
+        if _tables_initialized:
+            return
+        try:
+            inspector = inspect(db.engine)
+            if not inspector.has_table('users') or not inspector.has_table('pickup_requests'):
+                db.create_all()
+            _tables_initialized = True
+        except Exception as e:
+            # DB might not be ready yet; try again on the next request
+            app.logger.warning(f"Table check/creation failed; will retry on next request: {e}")
+
+@app.before_request
+def _ensure_tables_before_request():
+    ensure_tables_once()
 
 
 # Models
@@ -73,14 +98,6 @@ class PickupRequest(db.Model):
     special_instructions = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     completion_date = db.Column(db.DateTime)
-
-# Ensure tables exist when the first request hits the app (helps if DB was not ready at startup)
-@app.before_first_request
-def ensure_tables_created():
-    try:
-        db.create_all()
-    except Exception as e:
-        app.logger.error(f"DB init on first request failed: {e}")
 
 @login_manager.user_loader
 def load_user(user_id):
