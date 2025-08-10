@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import re
 import os
-from sqlalchemy import inspect
+from sqlalchemy import inspect, func
+from functools import wraps
 import threading
 from flask_wtf import CSRFProtect
 from flask_wtf import csrf as csrf_module
@@ -66,6 +67,8 @@ def ensure_tables_once():
             inspector = inspect(db.engine)
             if not inspector.has_table('users') or not inspector.has_table('pickup_requests'):
                 db.create_all()
+            # Ensure an admin exists if env vars provided
+            create_admin_if_needed()
             _tables_initialized = True
         except Exception as e:
             # DB might not be ready yet; try again on the next request
@@ -101,6 +104,10 @@ class User(db.Model, UserMixin):
     business_type = db.Column(db.String(50))
     materials_accepted = db.Column(db.String(200))
     operating_hours = db.Column(db.String(100))
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
 
 class PickupRequest(db.Model):
     __tablename__ = 'pickup_requests'
@@ -385,6 +392,99 @@ def my_requests():
         .all()
     )
     return render_template('pickup/my_requests.html', requests=user_requests)
+
+# Admin bootstrap and access control
+
+def create_admin_if_needed():
+    try:
+        # If any admin exists, do nothing
+        if User.query.filter_by(role='admin').first():
+            return
+        admin_email = os.environ.get('ADMIN_EMAIL')
+        admin_password = os.environ.get('ADMIN_PASSWORD')
+        admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
+        if not (admin_email and admin_password):
+            app.logger.info('Admin bootstrap skipped: ADMIN_EMAIL/ADMIN_PASSWORD not set')
+            return
+        user = User.query.filter_by(email=admin_email).first()
+        if not user:
+            user = User(
+                username=admin_username,
+                email=admin_email,
+                password=generate_password_hash(admin_password),
+                role='admin'
+            )
+            db.session.add(user)
+        else:
+            user.role = 'admin'
+            user.password = generate_password_hash(admin_password)
+        db.session.commit()
+        app.logger.info('Admin user bootstrapped/updated')
+    except Exception as e:
+        app.logger.warning(f'Admin bootstrap failed: {e}')
+
+
+def admin_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            flash('Admin access required.', 'danger')
+            return redirect(url_for('home'))
+        return view(*args, **kwargs)
+    return wrapped
+
+# Admin routes
+@app.route('/admin')
+@login_required
+@admin_required
+def admin_dashboard():
+    total_users = User.query.count()
+    users_by_role = dict(db.session.query(User.role, func.count(User.id)).group_by(User.role).all())
+    total_pickups = PickupRequest.query.count()
+    pickups_by_status = dict(db.session.query(PickupRequest.status, func.count(PickupRequest.id)).group_by(PickupRequest.status).all())
+    recent_signups = User.query.order_by(User.created_at.desc()).limit(10).all()
+    recent_pickups = PickupRequest.query.order_by(PickupRequest.created_at.desc()).limit(10).all()
+    return render_template(
+        'dashboard/admin.html',
+        total_users=total_users,
+        users_by_role=users_by_role,
+        total_pickups=total_pickups,
+        pickups_by_status=pickups_by_status,
+        recent_signups=recent_signups,
+        recent_pickups=recent_pickups,
+    )
+
+@app.route('/admin/users/<int:user_id>/role', methods=['POST'])
+@login_required
+@admin_required
+def admin_update_user_role(user_id):
+    new_role = request.form.get('role', '').strip()
+    allowed = {'household', 'business', 'collector', 'recycling_center', 'admin'}
+    user = db.session.get(User, user_id)
+    if not user:
+        flash('User not found.', 'warning')
+        return redirect(url_for('admin_dashboard'))
+    if new_role not in allowed:
+        flash('Invalid role selected.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    if user.id == current_user.id and new_role != 'admin':
+        flash('You cannot remove your own admin access.', 'warning')
+        return redirect(url_for('admin_dashboard'))
+    user.role = new_role
+    db.session.commit()
+    flash(f'Updated role for {user.username} to {new_role}.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+# One-time bootstrap URL (protect with secret token)
+@app.route('/bootstrap-admin-setup')
+def bootstrap_admin_setup():
+    token = request.args.get('token')
+    expected = os.environ.get('ADMIN_BOOTSTRAP_TOKEN')
+    if not expected or token != expected:
+        return ('Forbidden', 403)
+    ensure_tables_once()
+    create_admin_if_needed()
+    return 'Admin bootstrap complete', 200
 
 # Error handlers and health check
 @app.errorhandler(404)

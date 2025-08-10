@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Admin Dashboard</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted small">Total Users</div>
+        <div class="fs-3 fw-bold">{{ total_users }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted small">Users by Role</div>
+        <ul class="mb-0 small">
+          {% for role, count in users_by_role.items() %}
+            <li>{{ role|capitalize }}: {{ count }}</li>
+          {% endfor %}
+        </ul>
+      </div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted small">Total Pickups</div>
+        <div class="fs-3 fw-bold">{{ total_pickups }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted small">Pickups by Status</div>
+        <ul class="mb-0 small">
+          {% for status, count in pickups_by_status.items() %}
+            <li>{{ status|capitalize }}: {{ count }}</li>
+          {% endfor %}
+        </ul>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">Recent Signups</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+              <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Joined</th><th></th></tr></thead>
+              <tbody>
+              {% for u in recent_signups %}
+                <tr>
+                  <td>{{ u.username }}</td>
+                  <td>{{ u.email }}</td>
+                  <td><span class="badge bg-secondary">{{ u.role }}</span></td>
+                  <td>{{ u.created_at.strftime('%Y-%m-%d %H:%M') if u.created_at }}</td>
+                  <td>
+                    <form method="post" action="{{ url_for('admin_update_user_role', user_id=u.id) }}" class="d-flex gap-2">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                      <select class="form-select form-select-sm" name="role">
+                        {% set roles = ['household','business','collector','recycling_center','admin'] %}
+                        {% for r in roles %}
+                          <option value="{{ r }}" {% if r == u.role %}selected{% endif %}>{{ r }}</option>
+                        {% endfor %}
+                      </select>
+                      <button class="btn btn-sm btn-primary" type="submit">Save</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">Recent Pickups</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+              <thead><tr><th>ID</th><th>Requester</th><th>Status</th><th>Created</th></tr></thead>
+              <tbody>
+              {% for p in recent_pickups %}
+                <tr>
+                  <td>#{{ p.id }}</td>
+                  <td>{{ p.requester.username if p.requester }}</td>
+                  <td>
+                    {% set badge =
+                      'warning' if p.status == 'pending' else
+                      ('primary' if p.status == 'accepted' else
+                      ('success' if p.status == 'completed' else 'secondary')) %}
+                    <span class="badge bg-{{ badge }}">{{ p.status|capitalize }}</span>
+                  </td>
+                  <td>{{ p.created_at.strftime('%Y-%m-%d %H:%M') if p.created_at }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
